@@ -3,8 +3,11 @@ import { createContext, useContext, useState, ReactNode, useEffect } from 'react
 import { AuthContextType, User } from '@/lib/types';
 import { toast } from 'sonner';
 
+// Define a type for the mock user that includes password
+type MockUser = User & { password: string };
+
 // Mock user data for the prototype
-const MOCK_USERS = [
+const MOCK_USERS: MockUser[] = [
   {
     id: '1',
     name: 'Demo User',
@@ -12,7 +15,7 @@ const MOCK_USERS = [
     password: 'password123',
     freefireId: '12345678',
     walletBalance: 100,
-    status: 'active' as const,
+    status: 'active',
     createdAt: new Date()
   }
 ];
@@ -79,20 +82,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         throw new Error('Email already in use');
       }
 
-      // Create new user
+      // Create new user with our User type
       const newUser: User = {
         id: (MOCK_USERS.length + 1).toString(),
         name,
         email,
-        freefireId, // This is now optional in the User interface
+        freefireId, // This is optional now
         walletBalance: 0,
         status: 'active',
         createdAt: new Date()
       };
 
-      // Add to mock data (in a real app, this would be a server call)
-      // We need to add the password here, which isn't part of the User type
-      const newUserWithPassword = { ...newUser, password };
+      // Add to mock data with password (using our MockUser type)
+      const newUserWithPassword: MockUser = { ...newUser, password };
       MOCK_USERS.push(newUserWithPassword);
       
       setUser(newUser);

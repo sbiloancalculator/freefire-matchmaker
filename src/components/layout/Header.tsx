@@ -1,11 +1,11 @@
 
 import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/ui/logo";
 import { useAuth } from "@/context/AuthContext";
 import { AuthModal } from "@/components/auth/AuthModal";
-import { Menu, X } from "lucide-react";
+import { Menu, X, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export const Header = () => {
@@ -14,6 +14,7 @@ export const Header = () => {
   const [authView, setAuthView] = useState<"login" | "register">("login");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
 
   const openLoginModal = () => {
     setAuthView("login");
@@ -27,6 +28,11 @@ export const Header = () => {
 
   const isActive = (path: string) => {
     return location.pathname === path;
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate("/");
   };
 
   return (
@@ -87,10 +93,15 @@ export const Header = () => {
           <div className="hidden md:flex items-center space-x-4">
             {isAuthenticated ? (
               <div className="flex items-center space-x-4">
-                <div className="text-sm text-muted-foreground">
-                  Welcome, <span className="font-medium text-foreground">{user?.name}</span>
-                </div>
-                <Button variant="ghost" onClick={logout}>
+                <Button 
+                  variant="ghost" 
+                  className="flex items-center gap-2"
+                  onClick={() => navigate("/profile")}
+                >
+                  <User className="h-4 w-4" />
+                  <span>{user?.name}</span>
+                </Button>
+                <Button variant="ghost" onClick={handleLogout}>
                   Logout
                 </Button>
               </div>
@@ -170,6 +181,18 @@ export const Header = () => {
                 Admin
               </Link>
             )}
+            {isAuthenticated && (
+              <Link
+                to="/profile"
+                className={cn(
+                  "block px-3 py-2 rounded-md text-base font-medium hover:bg-accent",
+                  isActive("/profile") ? "text-primary" : "text-foreground/80"
+                )}
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Profile
+              </Link>
+            )}
           </div>
           <div className="pt-4 pb-3 border-t border-border">
             <div className="px-2 space-y-1">
@@ -182,7 +205,7 @@ export const Header = () => {
                     variant="ghost"
                     className="w-full justify-start"
                     onClick={() => {
-                      logout();
+                      handleLogout();
                       setMobileMenuOpen(false);
                     }}
                   >

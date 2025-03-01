@@ -17,6 +17,16 @@ const MOCK_USERS: MockUser[] = [
     walletBalance: 100,
     status: 'active',
     createdAt: new Date()
+  },
+  {
+    id: '2',
+    name: 'Admin User',
+    email: 'admin@example.com',
+    password: 'admin123',
+    freefireId: '87654321',
+    walletBalance: 500,
+    status: 'admin',
+    createdAt: new Date()
   }
 ];
 

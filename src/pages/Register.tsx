@@ -51,7 +51,8 @@ const Register = () => {
         description: "Your account has been created",
       });
       
-      navigate("/profile");
+      // Redirect to dashboard after successful registration
+      navigate("/dashboard");
     } catch (error) {
       toast({
         title: "Registration failed",

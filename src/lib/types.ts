@@ -37,6 +37,7 @@ export interface Tournament {
   roomId?: string;
   password?: string;
   image?: string;
+  winners?: Winner[];
 }
 
 export interface Payment {
@@ -55,6 +56,7 @@ export interface Winner {
   userId: string;
   rank: number;
   prizeAmount: number;
+  userName?: string;
 }
 
 export interface AuthContextType {

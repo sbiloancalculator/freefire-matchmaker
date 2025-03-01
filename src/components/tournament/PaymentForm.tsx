@@ -10,6 +10,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { QrCode } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { PaymentStatus } from "@/lib/types";
+import { useTournaments } from "@/context/TournamentContext";
 
 // Validation schema
 const formSchema = z.object({
@@ -28,6 +29,7 @@ interface PaymentFormProps {
 
 export function PaymentForm({ tournamentId, entryFee, onSuccess }: PaymentFormProps) {
   const { toast } = useToast();
+  const { verifyPayment } = useTournaments();
   const [paymentStatus, setPaymentStatus] = useState<PaymentStatus | null>(null);
   const [isVerifying, setIsVerifying] = useState(false);
 
@@ -42,24 +44,33 @@ export function PaymentForm({ tournamentId, entryFee, onSuccess }: PaymentFormPr
     try {
       setIsVerifying(true);
       
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Call the tournament context to verify payment
+      const status = await verifyPayment(tournamentId, values.utrNumber);
+      setPaymentStatus(status);
       
-      // Simulate verification (in a real app, this would call an actual API)
-      // We're using a mock successful response
-      setPaymentStatus(PaymentStatus.UNDER_REVIEW);
-      
-      toast({
-        title: "Payment verification initiated",
-        description: "We'll notify you once your payment is verified",
-      });
-      
-      // In a real app, you would redirect to a confirmation page or refresh the tournament details
-      onSuccess();
+      if (status === PaymentStatus.VERIFIED) {
+        toast({
+          title: "Payment verified successfully",
+          description: "You have successfully joined the tournament",
+        });
+        onSuccess();
+      } else if (status === PaymentStatus.UNDER_REVIEW) {
+        toast({
+          title: "Payment under review",
+          description: "Your payment is being reviewed by the admin",
+        });
+        onSuccess();
+      } else {
+        toast({
+          title: "Payment verification failed",
+          description: "Please check your UTR number and try again",
+          variant: "destructive",
+        });
+      }
     } catch (error) {
       toast({
         title: "Verification failed",
-        description: "Please check your UTR number and try again",
+        description: error instanceof Error ? error.message : "Please check your UTR number and try again",
         variant: "destructive",
       });
     } finally {
@@ -74,7 +85,7 @@ export function PaymentForm({ tournamentId, entryFee, onSuccess }: PaymentFormPr
           <QrCode className="h-20 w-20" />
         </div>
         <p className="text-lg font-medium">Scan to Pay ₹{entryFee}</p>
-        <p className="text-sm text-muted-foreground">UPI ID: freefiretournaments@ybl</p>
+        <p className="text-sm text-muted-foreground">UPI ID: 9427415370@fam</p>
       </div>
       
       <Alert>
@@ -109,6 +120,14 @@ export function PaymentForm({ tournamentId, entryFee, onSuccess }: PaymentFormPr
           </Button>
         </form>
       </Form>
+      
+      {paymentStatus === PaymentStatus.REJECTED && (
+        <Alert className="mt-4 border-red-200 bg-red-50">
+          <AlertDescription className="text-red-600">
+            Your payment verification failed. If you have any issues, please contact admin on WhatsApp: 9427415370
+          </AlertDescription>
+        </Alert>
+      )}
     </div>
   );
 }

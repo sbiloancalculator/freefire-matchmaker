@@ -1,5 +1,5 @@
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,13 +7,25 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Search, Users, Trophy, DollarSign, UserPlus, Calendar } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { 
+  Search, Users, Trophy, DollarSign, UserPlus, Calendar, 
+  AlertTriangle, Shield, FileText, Settings, Bell, CheckCircle, XCircle
+} from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { TournamentStatus, PaymentStatus } from "@/lib/types";
+import { UserManagement } from "@/components/admin/UserManagement";
+import { PaymentVerification } from "@/components/admin/PaymentVerification";
+import { TournamentManagement } from "@/components/admin/TournamentManagement";
+import { LegalCompliance } from "@/components/admin/LegalCompliance";
+import { AdminSettings } from "@/components/admin/AdminSettings";
 
 const AdminDashboard = () => {
   const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState("tournaments");
 
   // Redirect if not logged in or not an admin
   useEffect(() => {
@@ -28,84 +40,14 @@ const AdminDashboard = () => {
     return null; // Don't render anything while redirecting
   }
 
-  // Mock data for admin dashboard
-  const recentTournaments = [
-    {
-      id: "1",
-      name: "Weekend Warriors Cup",
-      date: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000),
-      participants: 48,
-      maxParticipants: 100,
-      status: TournamentStatus.UPCOMING
-    },
-    {
-      id: "2",
-      name: "Pro Series Match",
-      date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-      participants: 75,
-      maxParticipants: 100,
-      status: TournamentStatus.UPCOMING
-    },
-    {
-      id: "3",
-      name: "Free Fire League",
-      date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
-      participants: 100,
-      maxParticipants: 100,
-      status: TournamentStatus.COMPLETED
-    }
-  ];
-
-  // Mock payment verifications pending
-  const pendingPayments = [
-    {
-      id: "1",
-      userId: "user123",
-      userName: "Rahul Sharma",
-      tournamentId: "1",
-      tournamentName: "Weekend Warriors Cup",
-      amount: 100,
-      utrNumber: "UTRB123456789",
-      status: PaymentStatus.PENDING,
-      date: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000)
-    },
-    {
-      id: "2",
-      userId: "user456",
-      userName: "Priya Patel",
-      tournamentId: "1",
-      tournamentName: "Weekend Warriors Cup",
-      amount: 100,
-      utrNumber: "UTRA987654321",
-      status: PaymentStatus.PENDING,
-      date: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000)
-    }
-  ];
-
-  // Mock recent users
-  const recentUsers = [
-    {
-      id: "user123",
-      name: "Rahul Sharma",
-      email: "rahul@example.com",
-      registeredDate: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
-      status: "active"
-    },
-    {
-      id: "user456",
-      name: "Priya Patel",
-      email: "priya@example.com",
-      registeredDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
-      status: "active"
-    },
-    {
-      id: "user789",
-      name: "Amit Kumar",
-      email: "amit@example.com",
-      registeredDate: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
-      status: "active"
-    }
-  ];
+  // Mock data for admin dashboard summary
+  const dashboardSummary = {
+    totalUsers: 150,
+    newUsers: 24,
+    activeTournaments: 5,
+    revenue: 12500,
+    pendingVerifications: 2
+  };
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -119,16 +61,16 @@ const AdminDashboard = () => {
         </div>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium">Total Users</CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">150</div>
+            <div className="text-2xl font-bold">{dashboardSummary.totalUsers}</div>
             <p className="text-xs text-muted-foreground">
-              +12 from last week
+              +{dashboardSummary.newUsers} from last week
             </p>
           </CardContent>
         </Card>
@@ -138,7 +80,7 @@ const AdminDashboard = () => {
             <Trophy className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">5</div>
+            <div className="text-2xl font-bold">{dashboardSummary.activeTournaments}</div>
             <p className="text-xs text-muted-foreground">
               2 tournaments this week
             </p>
@@ -150,7 +92,7 @@ const AdminDashboard = () => {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">₹12,500</div>
+            <div className="text-2xl font-bold">₹{dashboardSummary.revenue}</div>
             <p className="text-xs text-muted-foreground">
               +₹4,000 from last month
             </p>
@@ -162,195 +104,90 @@ const AdminDashboard = () => {
             <UserPlus className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">24</div>
+            <div className="text-2xl font-bold">{dashboardSummary.newUsers}</div>
             <p className="text-xs text-muted-foreground">
               This week
             </p>
           </CardContent>
         </Card>
-      </div>
-      
-      <div className="mb-8">
         <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle>Payment Verifications</CardTitle>
-              <Badge variant="outline" className="ml-2">{pendingPayments.length} pending</Badge>
-            </div>
-            <CardDescription>
-              Manual verification of tournament registration payments
-            </CardDescription>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium">Pending Payments</CardTitle>
+            <AlertTriangle className="h-4 w-4 text-amber-500" />
           </CardHeader>
           <CardContent>
-            {pendingPayments.length > 0 ? (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>User</TableHead>
-                    <TableHead>Tournament</TableHead>
-                    <TableHead>Amount</TableHead>
-                    <TableHead>UTR Number</TableHead>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {pendingPayments.map((payment) => (
-                    <TableRow key={payment.id}>
-                      <TableCell className="font-medium">{payment.userName}</TableCell>
-                      <TableCell>{payment.tournamentName}</TableCell>
-                      <TableCell>₹{payment.amount}</TableCell>
-                      <TableCell className="font-mono">{payment.utrNumber}</TableCell>
-                      <TableCell>{payment.date.toLocaleDateString()}</TableCell>
-                      <TableCell>
-                        <div className="flex space-x-2">
-                          <Button variant="outline" size="sm">
-                            Verify
-                          </Button>
-                          <Button variant="outline" size="sm" className="text-red-500">
-                            Reject
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            ) : (
-              <div className="text-center py-6">
-                <p className="text-muted-foreground">No pending payment verifications</p>
-              </div>
-            )}
+            <div className="text-2xl font-bold">{dashboardSummary.pendingVerifications}</div>
+            <p className="text-xs text-muted-foreground">
+              Require verification
+            </p>
           </CardContent>
         </Card>
       </div>
       
-      <Tabs defaultValue="tournaments" className="mb-8">
-        <TabsList>
+      <PaymentVerification />
+      
+      <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="mb-8">
+        <TabsList className="grid grid-cols-5 mb-4">
           <TabsTrigger value="tournaments">Tournaments</TabsTrigger>
           <TabsTrigger value="users">Users</TabsTrigger>
+          <TabsTrigger value="legal">Legal & Compliance</TabsTrigger>
+          <TabsTrigger value="settings">Settings</TabsTrigger>
+          <TabsTrigger value="notifications">Notifications</TabsTrigger>
         </TabsList>
         
         <TabsContent value="tournaments">
-          <Card>
-            <CardHeader>
-              <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                <CardTitle>All Tournaments</CardTitle>
-                <div className="flex items-center w-full md:w-auto">
-                  <div className="relative flex-1 mr-2">
-                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      type="search"
-                      placeholder="Search tournaments..."
-                      className="pl-8"
-                    />
-                  </div>
-                  <Button variant="outline" size="sm">
-                    Filter
-                  </Button>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Participants</TableHead>
-                    <TableHead>Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {recentTournaments.map((tournament) => (
-                    <TableRow key={tournament.id}>
-                      <TableCell className="font-medium">{tournament.name}</TableCell>
-                      <TableCell>{new Date(tournament.date).toLocaleDateString()}</TableCell>
-                      <TableCell>
-                        <Badge className={
-                          tournament.status === TournamentStatus.UPCOMING ? "bg-blue-500" : 
-                          tournament.status === TournamentStatus.ACTIVE ? "bg-green-500" : 
-                          "bg-gray-500"
-                        }>
-                          {tournament.status}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>{tournament.participants}/{tournament.maxParticipants}</TableCell>
-                      <TableCell>
-                        <div className="flex space-x-2">
-                          <Button variant="outline" size="sm" onClick={() => navigate(`/tournaments/${tournament.id}`)}>
-                            View
-                          </Button>
-                          <Button variant="outline" size="sm">
-                            Edit
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
+          <TournamentManagement />
         </TabsContent>
         
         <TabsContent value="users">
+          <UserManagement />
+        </TabsContent>
+        
+        <TabsContent value="legal">
+          <LegalCompliance />
+        </TabsContent>
+        
+        <TabsContent value="settings">
+          <AdminSettings />
+        </TabsContent>
+        
+        <TabsContent value="notifications">
           <Card>
             <CardHeader>
-              <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                <CardTitle>Users</CardTitle>
-                <div className="flex items-center w-full md:w-auto">
-                  <div className="relative flex-1 mr-2">
-                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      type="search"
-                      placeholder="Search users..."
-                      className="pl-8"
-                    />
-                  </div>
-                  <Button variant="outline" size="sm">
-                    Filter
-                  </Button>
-                </div>
-              </div>
+              <CardTitle>System Notifications</CardTitle>
+              <CardDescription>
+                Important alerts and system messages
+              </CardDescription>
             </CardHeader>
             <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Email</TableHead>
-                    <TableHead>Registration Date</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {recentUsers.map((user) => (
-                    <TableRow key={user.id}>
-                      <TableCell className="font-medium">{user.name}</TableCell>
-                      <TableCell>{user.email}</TableCell>
-                      <TableCell>{user.registeredDate.toLocaleDateString()}</TableCell>
-                      <TableCell>
-                        <Badge variant="outline" className="capitalize">
-                          {user.status}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex space-x-2">
-                          <Button variant="outline" size="sm">
-                            View
-                          </Button>
-                          <Button variant="outline" size="sm" className="text-red-500">
-                            Ban
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+              <div className="space-y-4">
+                <div className="flex items-center p-4 border rounded-lg bg-muted/20">
+                  <Bell className="h-5 w-5 mr-3 text-blue-500" />
+                  <div className="flex-1">
+                    <h4 className="font-medium">Morning Tournament Starting Soon</h4>
+                    <p className="text-sm text-muted-foreground">Morning tournament at 9:00 AM has 18/20 players registered</p>
+                  </div>
+                  <Badge variant="outline">6 min ago</Badge>
+                </div>
+                
+                <div className="flex items-center p-4 border rounded-lg bg-muted/20">
+                  <CheckCircle className="h-5 w-5 mr-3 text-green-500" />
+                  <div className="flex-1">
+                    <h4 className="font-medium">Payment Verification Pending</h4>
+                    <p className="text-sm text-muted-foreground">2 new payment verifications need your approval</p>
+                  </div>
+                  <Badge variant="outline">2 hours ago</Badge>
+                </div>
+                
+                <div className="flex items-center p-4 border rounded-lg bg-muted/20">
+                  <Shield className="h-5 w-5 mr-3 text-amber-500" />
+                  <div className="flex-1">
+                    <h4 className="font-medium">Policy Update Required</h4>
+                    <p className="text-sm text-muted-foreground">Terms of service need to be updated for compliance</p>
+                  </div>
+                  <Badge variant="outline">1 day ago</Badge>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
@@ -365,28 +202,43 @@ const AdminDashboard = () => {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {recentTournaments
-              .filter(t => t.status === TournamentStatus.UPCOMING)
-              .map((tournament) => (
-                <div key={tournament.id} className="flex items-center">
-                  <div className="mr-4 flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
-                    <Calendar className="h-5 w-5 text-primary" />
-                  </div>
-                  <div className="flex-1 space-y-1">
-                    <p className="text-sm font-medium leading-none">
-                      {tournament.name}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      {new Date(tournament.date).toLocaleDateString()}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Badge className="bg-blue-500">
-                      {tournament.participants}/{tournament.maxParticipants}
-                    </Badge>
-                  </div>
-                </div>
-              ))}
+            <div className="flex items-center">
+              <div className="mr-4 flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
+                <Calendar className="h-5 w-5 text-primary" />
+              </div>
+              <div className="flex-1 space-y-1">
+                <p className="text-sm font-medium leading-none">
+                  Morning Tournament
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Today at 9:00 AM
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <Badge className="bg-amber-500">
+                  18/20 players
+                </Badge>
+              </div>
+            </div>
+            
+            <div className="flex items-center">
+              <div className="mr-4 flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
+                <Calendar className="h-5 w-5 text-primary" />
+              </div>
+              <div className="flex-1 space-y-1">
+                <p className="text-sm font-medium leading-none">
+                  Evening Tournament
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Today at 9:00 PM
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <Badge className="bg-blue-500">
+                  12/20 players
+                </Badge>
+              </div>
+            </div>
           </div>
         </CardContent>
       </Card>

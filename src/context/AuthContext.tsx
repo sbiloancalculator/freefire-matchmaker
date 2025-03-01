@@ -84,14 +84,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         id: (MOCK_USERS.length + 1).toString(),
         name,
         email,
-        freefireId,
+        freefireId, // This is now optional in the User interface
         walletBalance: 0,
         status: 'active',
         createdAt: new Date()
       };
 
       // Add to mock data (in a real app, this would be a server call)
-      MOCK_USERS.push({ ...newUser, password });
+      // We need to add the password here, which isn't part of the User type
+      const newUserWithPassword = { ...newUser, password };
+      MOCK_USERS.push(newUserWithPassword);
       
       setUser(newUser);
       localStorage.setItem('ffuser', JSON.stringify(newUser));

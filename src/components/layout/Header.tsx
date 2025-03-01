@@ -6,6 +6,7 @@ import { Logo } from "@/components/ui/logo";
 import { useAuth } from "@/context/AuthContext";
 import { AuthModal } from "@/components/auth/AuthModal";
 import { Menu, X } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export const Header = () => {
   const { user, isAuthenticated, logout } = useAuth();
@@ -225,7 +226,3 @@ export const Header = () => {
     </header>
   );
 };
-
-function cn(...classes: (string | boolean | undefined)[]) {
-  return classes.filter(Boolean).join(" ");
-}

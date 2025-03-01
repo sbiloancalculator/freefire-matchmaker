@@ -18,7 +18,7 @@ export interface User {
   email: string;
   freefireId?: string;
   walletBalance: number;
-  status: "active" | "banned";
+  status: "active" | "banned" | "admin";
   createdAt: Date;
 }
 
@@ -61,7 +61,7 @@ export interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (name: string, email: string, password: string) => Promise<void>;
+  register: (name: string, email: string, password: string, freefireId?: string) => Promise<void>;
   logout: () => void;
 }
 

@@ -68,7 +68,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   // Register function
-  const register = async (name: string, email: string, password: string) => {
+  const register = async (name: string, email: string, password: string, freefireId: string = '') => {
     setIsLoading(true);
     try {
       // Simulate API call
@@ -84,6 +84,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         id: (MOCK_USERS.length + 1).toString(),
         name,
         email,
+        freefireId,
         walletBalance: 0,
         status: 'active',
         createdAt: new Date()

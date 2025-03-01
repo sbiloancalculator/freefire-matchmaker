@@ -9,11 +9,11 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Search } from "lucide-react";
-import { TournamentStatus } from "@/lib/types";
+import { TournamentStatus, Tournament } from "@/lib/types";
 import { toast } from "sonner";
 
 // Mock tournaments data
-const recentTournaments = [
+const recentTournaments: Tournament[] = [
   {
     id: "1",
     name: "Morning Tournament",
@@ -57,13 +57,13 @@ const recentTournaments = [
 
 export function TournamentManagement() {
   const navigate = useNavigate();
-  const [tournaments, setTournaments] = useState(recentTournaments);
+  const [tournaments, setTournaments] = useState<Tournament[]>(recentTournaments);
   const [showRoomDialog, setShowRoomDialog] = useState(false);
-  const [selectedTournament, setSelectedTournament] = useState<any>(null);
+  const [selectedTournament, setSelectedTournament] = useState<Tournament | null>(null);
   const [roomDetails, setRoomDetails] = useState({ roomId: "", password: "" });
 
-  const handleStartTournament = (tournament: any) => {
-    if (tournament.participants < tournament.minParticipants) {
+  const handleStartTournament = (tournament: Tournament) => {
+    if (tournament.participants < (tournament.minParticipants || 0)) {
       toast.error(`Cannot start tournament. Minimum ${tournament.minParticipants} players required.`);
       return;
     }
@@ -148,7 +148,7 @@ export function TournamentManagement() {
                   <TableCell>₹{tournament.entryFee}</TableCell>
                   <TableCell>
                     {tournament.participants}/{tournament.maxParticipants}
-                    {tournament.participants < tournament.minParticipants && (
+                    {tournament.participants < (tournament.minParticipants || 0) && (
                       <Badge className="ml-2 bg-amber-500">
                         Min {tournament.minParticipants}
                       </Badge>
@@ -169,7 +169,7 @@ export function TournamentManagement() {
                           variant="outline" 
                           size="sm"
                           onClick={() => handleStartTournament(tournament)}
-                          disabled={tournament.participants < tournament.minParticipants}
+                          disabled={tournament.participants < (tournament.minParticipants || 0)}
                         >
                           Start
                         </Button>

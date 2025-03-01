@@ -32,6 +32,7 @@ export interface Tournament {
   prizePool: number;
   participants: number;
   maxParticipants: number;
+  minParticipants?: number;
   status: TournamentStatus;
   roomId?: string;
   password?: string;
